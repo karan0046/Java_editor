@@ -3,11 +3,7 @@ package GUI;
 import java.awt.Button;
 import java.awt.Choice;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,15 +15,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.*;
-import javax.swing.JMenuBar;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
+
 public class Editor implements ActionListener{
 
 	public static void main(String[] args) {
 		   new Editor();
-		 
-		 
 	}
 
 	JFrame jf = new JFrame();	
@@ -80,14 +74,17 @@ public class Editor implements ActionListener{
 	
 	// compile options
 	JMenuItem cosc = new JMenuItem("Save");
-	JMenuItem coc = new JMenuItem("Compile");
-	JMenuItem cor = new JMenuItem("Run");
+	JMenuItem coc = new JMenuItem("Package File");
+	JMenuItem cor = new JMenuItem("Normal File");
 	
 	//run options
-	JMenuItem rc = new JMenuItem("Compile");
-	JMenuItem rr = new JMenuItem("Run");
+	JMenuItem rc = new JMenuItem("Package File");
+	JMenuItem rr = new JMenuItem("Normal File");
 		
 	public Editor() {
+		
+		
+
 		//UIManager.put(jmb.getBackground(), Color.orange);
 		// create 
 		create.setMnemonic(KeyEvent.VK_C);
@@ -147,6 +144,7 @@ public class Editor implements ActionListener{
 		compile.add(cosc);
 		compile.addSeparator();
 		compile.add(coc);
+		compile.addSeparator();
 		compile.add(cor);
 		cosc.addActionListener(this);
 		coc.addActionListener(this);
@@ -174,7 +172,7 @@ public class Editor implements ActionListener{
 		jmb.add(run);
 		
 		
-		jmb.setBackground(Color.ORANGE);
+		jmb.setBackground(Color.LIGHT_GRAY);
 		jf.add(scroll);
 		jf.setJMenuBar(jmb);
 		jf.setTitle("Java-Editor");
@@ -243,7 +241,6 @@ public class Editor implements ActionListener{
 			//If a string was returned, say so.
 			if ((s != null) && (s.length() > 0)) {
 			    textarea.setFont(new Font(s,Font.PLAIN,16));
-				//setLabel("Green eggs and... " + s + "!");
 			}
 
 			//JOptionPane.showMessageDialog(null, "working"); 
@@ -266,10 +263,7 @@ public class Editor implements ActionListener{
 			
 			//JOptionPane.showMessageDialog(null, "working"); 
 		}
-		//if(e.getSource().equals(eu)) {
-			//textarea.;
-			//JOptionPane.showMessageDialog(null, "working"); 
-		//}
+		
 		if(e.getSource().equals(ecu)) {
 			textarea.cut();
 			//JOptionPane.showMessageDialog(null, "working"); 
@@ -290,7 +284,47 @@ public class Editor implements ActionListener{
 		if(e.getActionCommand().equals("Exit")) {
 			System.exit(0);
 		}
-		if(e.getActionCommand().equals("Compile")) {
+		
+		if(e.getSource().equals(coc)) {
+       	 JFileChooser fol = new JFileChooser();
+       	 fol.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+       	 if(fol.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+       		 String pkg = fol.getSelectedFile().getName();
+       		 String path = fol.getSelectedFile().getParent();
+       		 String file = null;
+       		 JFileChooser fil = new JFileChooser(new File(fol.getSelectedFile().getAbsolutePath()));
+       		 
+       		 if(fil.showDialog(fol, null)==JFileChooser.APPROVE_OPTION) {
+       			 file = fil.getSelectedFile().getName();
+       			 
+       		 }
+       		 
+       		 //JFileChooser fl = new JFileChooser();
+       		 //if(fl.showDialog(fol, "Run")==JFileChooser.APPROVE_OPTION){
+				
+				String comd = "javac ";
+				comd = comd.concat("./");
+				comd = comd.concat(pkg);
+				comd = comd.concat("/");
+			    comd = comd.concat(file);
+			    comd = comd.concat(" & pause");
+			    
+			    /*System.out.println(comd);
+			    System.out.println(path);
+			    System.out.println(pkg);
+			    */
+			    try {
+			           var processBuilder = new ProcessBuilder();
+			           processBuilder.directory(new File(path));			
+	                   processBuilder.command("cmd.exe","/c","start","cmd","/c",comd).directory(new File(path));	        
+	                   processBuilder.start();	        
+			   }catch(Exception ex) {
+				      JOptionPane.showMessageDialog(null, ex.getMessage());
+				      ex.printStackTrace();
+			    }
+			}
+		}
+		if(e.getSource().equals(cor)) {
 			
 			if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				//String path = fc.getSelectedFile().getAbsolutePath();
@@ -301,7 +335,6 @@ public class Editor implements ActionListener{
 			    //System.out.println(cmd);
 			try {
 			var processBuilder = new ProcessBuilder();
-			//File s = fc.get//  "cmd","/k",
 	        processBuilder.command("cmd.exe","/c","start","cmd","/c",cmd).directory(new File(fc.getSelectedFile().getParent()));
 	        
 	        processBuilder.start();
@@ -312,78 +345,68 @@ public class Editor implements ActionListener{
 			}
 			}
 		}
-         if(e.getActionCommand().equals("Run")) {
-			
-			if(fc.showOpenDialog(compile) == JFileChooser.APPROVE_OPTION) {
-				//String path = fc.getSelectedFile().getAbsolutePath();
-				String cmd = "java ";
-				String name = fc.getSelectedFile().getName();
-			    cmd = cmd.concat(name);
-			    cmd = cmd.concat(" & pause");
-			    //System.out.println(cmd);
-			try {
-			var processBuilder = new ProcessBuilder();
-			//File s = fc.get//  "cmd","/k",
-	        processBuilder.command("cmd.exe","/c","start","cmd","/c",cmd).directory(new File(fc.getSelectedFile().getParent()));
-	        
-	        processBuilder.start();
-	        
-			}catch(Exception ex) {
-				JOptionPane.showMessageDialog(null, ex.getMessage());
-				ex.printStackTrace();
-			}
-			}
-		}
-		
-		/*
-		//file actions
-		if(e.getSource().equals(cp)) {
-			//JTextArea ta = new JTextArea();
-			//ta.setFont(f);
-			JOptionPane.showMessageDialog(null, "working");
-		}
-		if(e.getSource().equals(fopen)) {
-			
-			if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-				FileReader fr = null;
-				try {
-					fr = new FileReader(fc.getSelectedFile().getAbsolutePath());
-					textarea.read(fr,null);
-					fr.close();
-					//setTitle("working");
-				}catch(IOException ev) {
-					ev.printStackTrace();
-				}
-			}
-			
+         if(e.getSource().equals(rc)) {
+        	 JFileChooser fol = new JFileChooser();
+        	 fol.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        	 if(fol.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+        		 String pkg = fol.getSelectedFile().getName();
+        		 String path = fol.getSelectedFile().getParent();
+        		 String file = null;
+        		 JFileChooser fil = new JFileChooser(new File(fol.getSelectedFile().getAbsolutePath()));
+        		 
+        		 if(fil.showDialog(fol, null)==JFileChooser.APPROVE_OPTION) {
+        			 file = fil.getSelectedFile().getName();
+        			 
+        		 }
+        		 
+        		 //JFileChooser fl = new JFileChooser();
+        		 //if(fl.showDialog(fol, "Run")==JFileChooser.APPROVE_OPTION){
 				
-			//JOptionPane.showMessageDialog(null, "working");
-		}
-		if(e.getSource().equals(fsave)) {
-			if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-				FileWriter fw = null;
-				try {
-					fw = new FileWriter(fc.getSelectedFile().getAbsolutePath()+ ".txt");
-					textarea.write(fw);
-					fw.close();
-					//setTitle("working");
-				}catch(IOException ev) {
-					ev.printStackTrace();
-				}
+				String comd = "java ";
+				comd = comd.concat(pkg);
+				comd = comd.concat(".");
+				String b = file.substring(0, file.length()-5);
+			    comd = comd.concat(b);
+			    comd = comd.concat(" & pause");
+			    
+			    /*System.out.println(comd);
+			    System.out.println(path);
+			    System.out.println(pkg);
+			    */
+			    try {
+			           var processBuilder = new ProcessBuilder();
+			           processBuilder.directory(new File(path));			
+	                   processBuilder.command("cmd.exe","/c","start","cmd","/c",comd).directory(new File(path));	        
+	                   processBuilder.start();	        
+			   }catch(Exception ex) {
+				      JOptionPane.showMessageDialog(null, ex.getMessage());
+				      ex.printStackTrace();
+			    }
 			}
-			
-			
-			//JOptionPane.showMessageDialog(null, "working");
 		}
-		if(e.getSource().equals(fsaveas)) {
-			JOptionPane.showMessageDialog(null, "working");
-		}
-		if(e.getSource().equals(fprint)) {
-			JOptionPane.showMessageDialog(null, "working");
-		}
-		if(e.getSource().equals(fexit)) {
-			System.exit(0);
-		}*/
+         
+         if(e.getSource().equals(rr)) {
+ 			
+ 			if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+ 				//String path = fc.getSelectedFile().getAbsolutePath();
+ 				String cmd = "java ";
+ 				String name = fc.getSelectedFile().getName();
+ 			    cmd = cmd.concat(name);
+ 			    cmd = cmd.concat(" & pause");
+ 			    //System.out.println(cmd);
+ 			try {
+ 			var processBuilder = new ProcessBuilder();
+ 	        processBuilder.command("cmd.exe","/c","start","cmd","/c",cmd).directory(new File(fc.getSelectedFile().getParent()));
+ 	        
+ 	        processBuilder.start();
+ 	        
+ 			}catch(Exception ex) {
+ 				JOptionPane.showMessageDialog(null, ex.getMessage());
+ 				ex.printStackTrace();
+ 			}
+ 			}
+ 		}
+		
 	}
 
 }
